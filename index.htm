@@ -3,28 +3,31 @@
 <head><title>Chat Room</title>
 <style type="text/css">
 	html, body{width: 100%; height: 100%;}
+	.message{display: block; background-color: gray;}
 </style>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 </head>
 <body>
-
 
 <script type="text/javascript">
 var chatJS= {
 
 insert: function(contextElem){
 
-	var txt = document.createElement('textarea');
+	var txt = document.createElement('div');
+	txt.setAttribute('id', 'txtArea');
 	txt.style.width = '100%';
 	txt.style.height = '75%';
 
 	var tb = document.createElement('input');
+	tb.setAttribute('id', 'txtMssg');
 	tb.setAttribute('type', 'text');
 	tb.style.width = '80%';
 	tb.style.height = '20%';
 	tb.style.verticalAlign = 'top';
 
 	var bt = document.createElement('button');
+	bt.setAttribute('id', 'btnSnd');
 	bt.innerHTML = 'SEND';
 	bt.style.width = '19%';
 	bt.style.height = '20%';
@@ -32,18 +35,27 @@ insert: function(contextElem){
 	contextElem.appendChild(txt);
 	contextElem.appendChild(tb);
 	contextElem.appendChild(bt);
+
 },
 
 
 send: function(){
-	$.post('server.js', {message : $('$el').val()}).done(this.receive);
-},
-
-receive: function(data){
-	console.log(data);
-}
+	var mssgNum = ($('#txtArea').is(':empty')) ? -1 : parseInt($('#txtArea span:last').attr('data-num'), 10);
+	$.post('/post', {sn:'Human#1', message : $('#txtMssg').val(), last:mssgNum}).done(
+		function(data){
+			console.log(data);
+			temp = JSON.parse(data);
+			temp.forEach(function(sms)
+			{
+				$('#txtArea').append('<span class="message" data-num="' + sms.num + '">' + sms.sn + ': ' + sms.text + '</span>');
+			});
+		});
+	}
 };
+
 chatJS.insert(document.getElementsByTagName('body')[0]);
+$('#btnSnd').click(chatJS.send);
+
 
 </script>
 </body>
