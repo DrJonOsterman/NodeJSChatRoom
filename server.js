@@ -53,11 +53,5 @@ app.use(connectRt(function(router){
 
 app.listen(process.env.PORT || 3000);
 
-//There is no way to implement a real chatroom with http requests
-//The simulation will have to be making frequent requests to the server
-//Client makes post
-//server takes post and gives it post number
-//server keeps getting post number
-//on response to post, bring back the latest x posts
-//have client-code matchup which posts are already on screen
-//client sends request with latest post
+//There is no way to implement a real chatroom with http requests, that is broadcasting new posts to everyone without the client machine requesting it
+//The simulation will have to be a periodic request sent out.
