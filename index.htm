@@ -6,6 +6,8 @@
 	.message{display: block; background-color: gray;}
 </style>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="apprise-1.5.min.js"></script>
+<link rel="stylesheet" href="apprise.min.css" type="text/css" />
 </head>
 <body>
 
@@ -39,6 +41,7 @@ insert: function(contextElem){
 },
 
 
+
 send: function(){
 	var mssgNum = ($('#txtArea').is(':empty')) ? -1 : parseInt($('#txtArea span:last').attr('data-num'), 10);
 	$.post('/post', {sn:'Human#1', message : $('#txtMssg').val(), last:mssgNum}).done(
@@ -53,8 +56,23 @@ send: function(){
 	}
 };
 
-chatJS.insert(document.getElementsByTagName('body')[0]);
-$('#btnSnd').click(chatJS.send);
+
+
+function begin(){
+	apprise('Please choose a username', {'input':true}, function(input){
+		if (input === false){begin();}
+		else
+		{ 
+			chatJS.insert(document.getElementsByTagName('body')[0]);
+			$('#btnSnd').click(chatJS.send);	
+		}
+	});
+}
+
+begin();
+
+
+
 
 
 </script>

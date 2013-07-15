@@ -55,12 +55,14 @@ app.use(connectRt(function(router){
 	});
 
 	router.post('/join', function(req, res, next){
+		posts.push({'sn': 'MessageBot', 'text':req.body.sn + ' has joined the conversation.'});
 		res.writeHead(200, {"Content-Type": "text/plain"});
-		res.write(req.body.userName + 'has joined the conversation.');
-		res.end();
+		res.end(getPostsInRange(0));
 	});
 }));
 
 app.listen(process.env.PORT || 3000);
  //There is no way to implement a real chatroom with http requests, that is broadcasting new posts to everyone without the client machine requesting it
 //The simulation will have to be a periodic request sent out.
+//Put server announcements in the queue as well
+//MessageBot: DBZGoku has joined the conversation
