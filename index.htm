@@ -60,6 +60,8 @@ else if(wButton=='cancel')
 
 <script type="text/javascript">
 var chatJS= {
+	userName: null,
+
 	insert: function(contextElem){
 		var txt = document.createElement('div');
 		txt.setAttribute('id', 'txtArea');
@@ -81,13 +83,14 @@ var chatJS= {
 		contextElem.appendChild(bt);
 	},
 
-	register: function(userName){
-		$.post('/join', {sn:userName}).done(this.updateWindow);
+	register: function(){
+		$.post('/join', {sn:this.userName}).done(this.updateWindow);
 	},
 
 	send: function(){
+		console.log('send activated');console.log(this);
 		var mssgNum = ($('#txtArea').is(':empty')) ? -1 : parseInt($('#txtArea span:last').attr('data-num'), 10);
-		$.post('/post', {sn:'Human#1', message : $('#txtMssg').val(), last:mssgNum}).done(this.updateWindow);
+		$.post('/post', {sn:chatJS.userName, message:$('#txtMssg').val(), last:mssgNum}).done(chatJS.updateWindow);
 	},
 
 	updateWindow: function(chatData){
@@ -106,9 +109,10 @@ function begin(){
 		}
 		else
 		{ 
-			chatJS.insert(document.getElementsByTagName('body')[0]); //insert code
-			$('#btnSnd').click(chatJS.send);//set up click event handler
-			chatJS.register(input);
+			chatJS.insert(document.getElementsByTagName('body')[0]); /*insert code*/
+			$('#btnSnd').click(chatJS.send);/*set up click event handler*/
+			chatJS.userName = input;
+			chatJS.register();
 		}
 	});
 }
