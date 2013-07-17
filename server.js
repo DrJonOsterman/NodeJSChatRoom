@@ -43,9 +43,6 @@ app.use(connectRt(function(router){
 	router.post('/post', function(req, res, next){
 		posts.push({'sn': req.body.sn, 'text':req.body.message});
 		res.writeHead(200, {"Content-Type": "text/plain"});
-		//This needs something more. If it's the first post AND the posts array is empty, serve as first message
-		//If it's the first post but posts array is populated serve everything (after req.body.post is pushed to posts array)
-
 		if (req.body.last === '-1')
 		{
 			if (posts.length === 0)
@@ -71,10 +68,4 @@ app.use(connectRt(function(router){
 }));
 
 app.listen(process.env.PORT || 3000);
- //There is no way to implement a real chatroom with http requests, that is broadcasting new posts to everyone without the client machine requesting it
-//The simulation will have to be a periodic request sent out.
-//Put server announcements in the queue as well
-//MessageBot: DBZGoku has joined the conversation
-
-//WEBSOCKETS
-//WHAT if there are no new posts, how should the thing respond
+//WEBSOCKETS, look into that
