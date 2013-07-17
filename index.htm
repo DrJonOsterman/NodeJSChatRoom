@@ -5,7 +5,8 @@
 	html, body{width: 100%; height: 100%;}
 	.message{display: block; background-color: gray;}
 </style>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<!-- <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.1.min.js"></script>-->
+<script type="text/javascript" src="http://localhost/MemoryGamma/lib/jquery-1.8.2.min.js"></script>
 <script type="text/javascript">function apprise(string,args,callback)
 {var default_args={'confirm':false,'verify':false,'input':false,'animate':false,'textOk':'Ok','textCancel':'Cancel','textYes':'Yes','textNo':'No'}
 if(args)
@@ -61,7 +62,11 @@ else if(wButton=='cancel')
 <script type="text/javascript">
 var chatJS= {
 	userName: null,
-
+	isLoopRunning: false,
+	requestInterval: 5000,
+	getLastMssgNum: function(){
+		return ($('#txtArea').is(':empty')) ? -1 : parseInt($('#txtArea span:last').attr('data-num'), 10);
+	},
 	insert: function(contextElem){
 		var txt = document.createElement('div');
 		txt.setAttribute('id', 'txtArea');
@@ -82,22 +87,38 @@ var chatJS= {
 		contextElem.appendChild(tb);
 		contextElem.appendChild(bt);
 	},
-
 	register: function(){
 		$.post('/join', {sn:this.userName}).done(this.updateWindow);
 	},
-
 	send: function(){
-		console.log('send activated');console.log(this);
-		var mssgNum = ($('#txtArea').is(':empty')) ? -1 : parseInt($('#txtArea span:last').attr('data-num'), 10);
-		$.post('/post', {sn:chatJS.userName, message:$('#txtMssg').val(), last:mssgNum}).done(chatJS.updateWindow);
+		$.post('/post', {sn:chatJS.userName, message:$('#txtMssg').val(), last:chatJS.getLastMssgNum()}).done(chatJS.updateWindow);
+		$('#txtMssg').val('');
 	},
-
 	updateWindow: function(chatData){
-		console.log('getting chat data'); console.log(chatData);
-		JSON.parse(chatData).forEach(function(sms){
-			$('#txtArea').append('<span class="message" data-num="' + sms.num + '">' + sms.sn + ': ' + sms.text + '</span>');
-		});
+		/*console.log('getting chat data');*/console.log(chatData);
+		if (chatData === 'No new posts')
+		{
+			return;
+		}
+		else
+		{
+			JSON.parse(chatData).forEach(function(sms){
+				$('#txtArea').append('<span class="message" data-num="' + sms.num + '">' + sms.sn + ': ' + sms.text + '</span>');
+			});
+			if(chatJS.isLoopRunning === false)
+			{
+				chatJS.requestLoop();
+			}
+		}
+	},
+	requestLoop: function(){
+		console.log('running the little loop');
+		chatJS.isLoopRunning = true;
+		function littleLoop(){
+			console.log('in the loop body');
+			$.post('/update', {sn:chatJS.userName, message:$('#txtMssg').val(), last:chatJS.getLastMssgNum()}).done(chatJS.updateWindow);
+		}
+		setInterval(littleLoop, chatJS.requestInterval);
 	}
 };
 
